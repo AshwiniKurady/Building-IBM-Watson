@@ -105,10 +105,7 @@ Changing the scoring function lowered the performance from (MMR ~ 25%) to (MRR ~
 
 Following is the split-up of the answers from the IR system for Top-10 & Top-30 answers :
 
-   N   #ExactMatch    #TotalMatch                             MRR%
-  --------------------------------------------------------------------
-  10       22         35 (13 top relevant but not Top@1)     25.02
-  30       22         49 (27 top relevant but not Top@1)     25.81
+![](/images/image3.png)
 
 Looking at the questions that are answered correctly, following are the common factors observed which help the simple IR system to perform well :
 
