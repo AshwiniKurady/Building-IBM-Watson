@@ -2,12 +2,13 @@
 IBM’s Watson is a Question Answering (QA) system that is similar to TV quiz show, Jeopardy.” However, the answers to many of the Jeopardy questions are actually titles of Wikipedia pages. The focus of this project is to classify the wikipedia pages and to find which page is the most likely answer to the given clue
 
 # How to run the jar file and directory structure:
+
 a. Running on terminal
 Download the index folder, wiki-subset folder and questions.txt into a single folder (please note that names of the folders need to match). Then, on the terminal, run the following command :
 
 java -jar FinalProject-1.0-SNAPSHOT-jar-with-dependencies.jar “<Downloaded_folder_containing_subfolders_for_index_wiki_questions>”
 
-# b. Running on IntelliJ
+b. Running on IntelliJ
 
 Download the source code from the link given above. Download the index folder, wiki-subset folder and questions.txt into a single folder (please note that names of the folders need to match) into the resources folder of the project as shown below :
 
