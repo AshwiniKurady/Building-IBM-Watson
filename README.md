@@ -4,13 +4,14 @@ IBM’s Watson is a Question Answering (QA) system that is similar to TV quiz sh
 # How to run the jar file and directory structure:
 a. Running on terminal
 Download the index folder, wiki-subset folder and questions.txt into a single folder (please note that names of the folders need to match). Then, on the terminal, run the following command :
+
 java -jar FinalProject-1.0-SNAPSHOT-jar-with-dependencies.jar “<Downloaded_folder_containing_subfolders_for_index_wiki_questions>”
-(Please note that wiki-subset folder and questions.txt are not uploaded – just index folder is uploaded to avoid duplicate copies being uploaded)
-b. Running on IntelliJ
+
+# b. Running on IntelliJ
+
 Download the source code from the link given above. Download the index folder, wiki-subset folder and questions.txt into a single folder (please note that names of the folders need to match) into the resources folder of the project as shown below :
+
 Place where files are read from :
-
-
 questions.txt – “src/main/resources/questions.txt”
 index - “src/main/resources/index/”
 wiki subset - “src/main/resources/wiki-subset/”
