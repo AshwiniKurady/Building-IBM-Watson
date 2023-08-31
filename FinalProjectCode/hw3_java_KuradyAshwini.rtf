@@ -1,0 +1,310 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2576
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;\f1\fmodern\fcharset0 Courier-Oblique;}
+{\colortbl;\red255\green255\blue255;\red191\green100\blue38;\red32\green32\blue32;\red153\green168\blue186;
+\red133\green96\blue154;\red109\green109\blue109;\red254\green187\blue91;\red88\green118\blue71;\red86\green132\blue173;
+}
+{\*\expandedcolortbl;;\csgenericrgb\c74902\c39216\c14902;\csgenericrgb\c12549\c12549\c12549;\csgenericrgb\c60000\c65882\c72941;
+\csgenericrgb\c52157\c37647\c60392;\csgenericrgb\c42745\c42745\c42745;\csgenericrgb\c99608\c73333\c35686;\csgenericrgb\c34510\c46275\c27843;\csgenericrgb\c33725\c51765\c67843;
+}
+\margl1440\margr1440\vieww25400\viewh15440\viewkind0
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f0\fs26 \cf2 \cb3 package \cf4 edu.arizona.cs\cf2 ;\
+\
+import \cf4 org.apache.lucene.analysis.standard.StandardAnalyzer\cf2 ;\
+import \cf4 org.apache.lucene.document.*\cf2 ;\
+import \cf4 org.apache.lucene.index.*\cf2 ;\
+import \cf4 org.apache.lucene.queryparser.classic.ParseException\cf2 ;\
+import \cf4 org.apache.lucene.queryparser.classic.QueryParser\cf2 ;\
+import \cf4 org.apache.lucene.search.IndexSearcher\cf2 ;\
+import \cf4 org.apache.lucene.search.Query\cf2 ;\
+import \cf4 org.apache.lucene.search.ScoreDoc\cf2 ;\
+import \cf4 org.apache.lucene.search.TopDocs\cf2 ;\
+import \cf4 org.apache.lucene.store.Directory\cf2 ;\
+import \cf4 org.apache.lucene.store.RAMDirectory\cf2 ;\
+import \cf4 org.apache.lucene.search.similarities.ClassicSimilarity\cf2 ;\
+\
+\
+import \cf4 java.io.File\cf2 ;\
+import \cf4 java.io.FileNotFoundException\cf2 ;\
+import \cf4 java.io.IOException\cf2 ;\
+import \cf4 java.util.*\cf2 ;\
+import \cf4 java.util.logging.Logger\cf2 ;\
+import \cf4 java.util.stream.Collectors\cf2 ;\
+\
+import static \cf4 java.util.logging.Level.
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 ;\
+\
+public class \cf4 QueryEngine \{\
+    \cf2 private boolean \cf5 indexExists \cf4 = \cf2 false;\
+    private \cf4 String \cf5 filePath\cf2 ;\
+    \cf6 //Initialize Index\
+    \cf2 private \cf4 StandardAnalyzer \cf5 analyzer\cf2 ;\
+    private \cf4 Directory \cf5 index\cf2 ;\
+    private \cf4 IndexWriterConfig \cf5 config\cf2 ;\
+    private \cf4 IndexWriter \cf5 writer\cf2 ;\
+\
+\
+    private final static \cf4 Logger 
+\f1\i \cf5 logger 
+\f0\i0 \cf4 = Logger.
+\f1\i getLogger
+\f0\i0 (QueryEngine.\cf2 class\cf4 .getName())\cf2 ;\
+\
+    public \cf7 QueryEngine\cf4 (String inputFile) \{\
+        \cf5 filePath \cf4 = inputFile\cf2 ;\
+     \cf6 //System.out.println(filePath);\
+        //Initialize Index\
+        \cf5 index \cf4 = \cf2 new \cf4 RAMDirectory()\cf2 ;\
+        \cf5 analyzer \cf4 = \cf2 new \cf4 StandardAnalyzer()\cf2 ;\
+        \cf5 config \cf4 = \cf2 new \cf4 IndexWriterConfig(\cf5 analyzer\cf4 )\cf2 ;\
+        try \cf4 \{\
+            \cf5 writer \cf4 = \cf2 new \cf4 IndexWriter(\cf5 index\cf2 , \cf5 config\cf4 )\cf2 ;\
+        \cf4 \} \cf2 catch \cf4 (\cf2 final \cf4 IOException e) \{\
+            
+\f1\i \cf5 logger
+\f0\i0 \cf4 .log(
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 , \cf8 "Query Engine Initialization failed"\cf2 , \cf4 e)\cf2 ;\
+        \cf4 \}\
+        buildIndex()\cf2 ;\
+    \cf4 \}\
+\
+    \cf2 private void \cf7 buildIndex\cf4 () \{\
+        ClassLoader classLoader = getClass().getClassLoader()\cf2 ;\
+        \cf4 File file = \cf2 new \cf4 File(classLoader.getResource(\cf5 filePath\cf4 ).getFile())\cf2 ;\
+       \cf5 config\cf4 .setSimilarity(\cf2 new \cf4 ClassicSimilarity())\cf2 ;\
+        try \cf4 (Scanner inputScanner = \cf2 new \cf4 Scanner(file)) \{\
+            \cf2 while \cf4 (inputScanner.hasNextLine()) \{\
+                String lineContent = inputScanner.nextLine()\cf2 ;\
+                \cf4 String docId = lineContent.split(\cf8 " "\cf4 )[\cf9 0\cf4 ]\cf2 ;\
+                \cf4 String content=lineContent.substring(docId.length()).trim()\cf2 ;\
+                
+\f1\i \cf4 addDoc
+\f0\i0 (\cf5 writer\cf2 , \cf4 content\cf2 , \cf4 docId)\cf2 ;\
+            \cf4 \}\
+            \cf5 writer\cf4 .commit()\cf2 ;\
+        \cf4 \}\
+        \cf2 catch \cf4 (FileNotFoundException e)\
+        \{\
+            
+\f1\i \cf5 logger
+\f0\i0 \cf4 .log(
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 , \cf8 "Unable to read file"\cf2 , \cf4 e)\cf2 ;\
+        \cf4 \}\
+        \cf2 catch \cf4 (IOException e)\
+        \{\
+            
+\f1\i \cf5 logger
+\f0\i0 \cf4 .log(
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 , \cf8 "Unable to commit IndexWriter"\cf2 , \cf4 e)\cf2 ;\
+        \cf4 \}\
+        \cf5 indexExists \cf4 = \cf2 true;\
+    \cf4 \}\
+\
+    \cf2 private static void \cf7 addDoc\cf4 (IndexWriter writer\cf2 , \cf4 String description\cf2 , \cf4 String docId) \{\
+        \cf2 try \cf4 \{\
+            Document doc = \cf2 new \cf4 Document()\cf2 ;\
+            \cf4 doc.add(\cf2 new \cf4 TextField(\cf8 "title"\cf2 , \cf4 description\cf2 , \cf4 Field.Store.
+\f1\i \cf5 YES
+\f0\i0 \cf4 ))\cf2 ;\
+            \cf4 doc.add(\cf2 new \cf4 StringField(\cf8 "docid"\cf2 , \cf4 docId\cf2 , \cf4 Field.Store.
+\f1\i \cf5 YES
+\f0\i0 \cf4 ))\cf2 ;\
+            \cf4 writer.addDocument(doc)\cf2 ;\
+\
+        \cf4 \}\
+        \cf2 catch \cf4 (\cf2 final \cf4 IOException ex)\
+        \{\
+            
+\f1\i \cf5 logger
+\f0\i0 \cf4 .log(
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 , \cf8 "Unable to write document with docId: " \cf4 + docId\cf2 , \cf4 ex)\cf2 ;\
+        \cf4 \}\
+    \}\
+\
+    \cf2 public static void \cf7 main\cf4 (String[] args) \{\
+        \cf2 try \cf4 \{\
+            String fileName = args.\cf5 length \cf4 > \cf9 0 \cf4 ? args[\cf9 0\cf4 ] : \cf8 "input.txt"\cf2 ;\
+            \cf4 System.
+\f1\i \cf5 out
+\f0\i0 \cf4 .println(\cf8 "******** Welcome to  Homework 3! ********"\cf4 )\cf2 ;\
+            \cf4 String[] query13a = \{\cf8 "information"\cf2 , \cf8 "retrieval"\cf4 \}\cf2 ;\
+            \cf4 QueryEngine objQueryEngine = \cf2 new \cf4 QueryEngine(fileName)\cf2 ;\
+            \cf4 List<ResultClass> resultClasses = objQueryEngine.runQueryOnIndex(query13a)\cf2 ;\
+            for \cf4 (ResultClass result : resultClasses) \{\
+                System.
+\f1\i \cf5 out
+\f0\i0 \cf4 .format(\cf8 "DocId: %s, DocTitle: %s, DocScore: %s\cf2 \\n\cf8 "\cf2 ,\
+                        \cf4 result.\cf5 DocName\cf4 .getField(\cf8 "docid"\cf4 ).stringValue()\cf2 ,\
+                        \cf4 result.\cf5 DocName\cf4 .getField(\cf8 "title"\cf4 ).stringValue()\cf2 ,\
+                        \cf4 result.\cf5 docScore\cf4 )\cf2 ;\
+            \cf4 \}\
+        \} \cf2 catch \cf4 (Exception ex) \{\
+            
+\f1\i \cf5 logger
+\f0\i0 \cf4 .log(
+\f1\i \cf5 SEVERE
+\f0\i0 \cf2 , \cf8 "Lucene execution failed"\cf2 , \cf4 ex)\cf2 ;\
+        \cf4 \}\
+    \}\
+\
+    \cf2 public \cf4 List<ResultClass> \cf7 runQueryOnIndex\cf4 (String[] input) \cf2 throws \cf4 IOException \{\
+        String concatenatedInput = Arrays.
+\f1\i stream
+\f0\i0 (input)\
+                .map(str -> str.concat(\cf8 " "\cf4 ))\
+                .collect(Collectors.
+\f1\i joining
+\f0\i0 ())\cf2 ;\
+        \cf4 QueryParser parser = \cf2 new \cf4 QueryParser(\cf8 "title"\cf2 , \cf5 analyzer\cf4 )\cf2 ;\
+        \cf4 Query query = \cf2 null;\
+        try \cf4 \{\
+            query = parser.parse(concatenatedInput)\cf2 ;\
+        \cf4 \} \cf2 catch \cf4 (ParseException e) \{\
+            \cf2 throw new \cf4 IOException(e)\cf2 ;\
+        \cf4 \}\
+        IndexReader reader = DirectoryReader.
+\f1\i open
+\f0\i0 (\cf5 index\cf4 )\cf2 ;\
+        \cf4 IndexSearcher searcher = \cf2 new \cf4 IndexSearcher(reader)\cf2 ;\
+        \cf4 searcher.setSimilarity(\cf2 new \cf4 ClassicSimilarity())\cf2 ;\
+        \cf4 TopDocs docs = searcher.search(query\cf2 , \cf9 10\cf4 )\cf2 ;\
+        \cf4 List<ResultClass> result = \cf2 new \cf4 ArrayList<>()\cf2 ;\
+        for \cf4 (ScoreDoc scoreDoc : docs.\cf5 scoreDocs\cf4 ) \{\
+            ResultClass resultClass = \cf2 new \cf4 ResultClass()\cf2 ;\
+            \cf4 resultClass.\cf5 DocName \cf4 = searcher.doc(scoreDoc.\cf5 doc\cf4 )\cf2 ;\
+            \cf4 resultClass.\cf5 docScore \cf4 = scoreDoc.\cf5 score\cf2 ;\
+            \cf4 result.add(resultClass)\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 result\cf2 ;\
+    \cf4 \}\
+    \cf2 public \cf4 List<ResultClass> \cf7 runANDQueryOnIndex\cf4 (String[] input) \cf2 throws \cf4 IOException \{\
+        String concatenatedInput = Arrays.
+\f1\i stream
+\f0\i0 (input)\
+                .map(str -> str.concat(\cf8 " AND "\cf4 ))\
+                .collect(Collectors.
+\f1\i joining
+\f0\i0 ())\cf2 ;\
+        \cf4 QueryParser parser = \cf2 new \cf4 QueryParser(\cf8 "title"\cf2 , \cf5 analyzer\cf4 )\cf2 ;\
+        \cf4 Query query = \cf2 null;\
+        try \cf4 \{\
+            query = parser.parse(concatenatedInput)\cf2 ;\
+        \cf4 \} \cf2 catch \cf4 (ParseException e) \{\
+            \cf2 throw new \cf4 IOException(e)\cf2 ;\
+        \cf4 \}\
+        IndexReader reader = DirectoryReader.
+\f1\i open
+\f0\i0 (\cf5 index\cf4 )\cf2 ;\
+        \cf4 IndexSearcher searcher = \cf2 new \cf4 IndexSearcher(reader)\cf2 ;\
+        \cf4 TopDocs docs = searcher.search(query\cf2 , \cf9 10\cf4 )\cf2 ;\
+        \cf4 List<ResultClass> result = \cf2 new \cf4 ArrayList<>()\cf2 ;\
+        for \cf4 (ScoreDoc scoreDoc : docs.\cf5 scoreDocs\cf4 ) \{\
+            ResultClass resultClass = \cf2 new \cf4 ResultClass()\cf2 ;\
+            \cf4 resultClass.\cf5 DocName \cf4 = searcher.doc(scoreDoc.\cf5 doc\cf4 )\cf2 ;\
+            \cf4 resultClass.\cf5 docScore \cf4 = scoreDoc.\cf5 score\cf2 ;\
+            \cf4 result.add(resultClass)\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 result\cf2 ;\
+    \cf4 \}\
+    \cf2 public \cf4 List<ResultClass> \cf7 runANDNOTQueryOnIndex\cf4 (String[] input) \cf2 throws \cf4 IOException \{\
+        String concatenatedInput = Arrays.
+\f1\i stream
+\f0\i0 (input)\
+                .map(str -> str.concat(\cf8 " AND NOT "\cf4 ))\
+                .collect(Collectors.
+\f1\i joining
+\f0\i0 ())\cf2 ;\
+        \cf4 QueryParser parser = \cf2 new \cf4 QueryParser(\cf8 "title"\cf2 , \cf5 analyzer\cf4 )\cf2 ;\
+        \cf4 Query query = \cf2 null;\
+        try \cf4 \{\
+            query = parser.parse(concatenatedInput)\cf2 ;\
+        \cf4 \} \cf2 catch \cf4 (ParseException e) \{\
+            \cf2 throw new \cf4 IOException(e)\cf2 ;\
+        \cf4 \}\
+        IndexReader reader = DirectoryReader.
+\f1\i open
+\f0\i0 (\cf5 index\cf4 )\cf2 ;\
+        \cf4 IndexSearcher searcher = \cf2 new \cf4 IndexSearcher(reader)\cf2 ;\
+        \cf4 TopDocs docs = searcher.search(query\cf2 , \cf9 10\cf4 )\cf2 ;\
+        \cf4 List<ResultClass> result = \cf2 new \cf4 ArrayList<>()\cf2 ;\
+        for \cf4 (ScoreDoc scoreDoc : docs.\cf5 scoreDocs\cf4 ) \{\
+            ResultClass resultClass = \cf2 new \cf4 ResultClass()\cf2 ;\
+            \cf4 resultClass.\cf5 DocName \cf4 = searcher.doc(scoreDoc.\cf5 doc\cf4 )\cf2 ;\
+            \cf4 resultClass.\cf5 docScore \cf4 = scoreDoc.\cf5 score\cf2 ;\
+            \cf4 result.add(resultClass)\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 result\cf2 ;\
+    \cf4 \}\
+    \cf2 public \cf4 List<ResultClass> \cf7 runANDWITHINQueryOnIndex\cf4 (String[] input) \cf2 throws \cf4 IOException \{\
+        String concatenatedInput = \cf8 "\cf2 \\"\cf8 information retrieval\cf2 \\"\cf8 ~1"\cf2 ;\
+        \cf4 QueryParser parser = \cf2 new \cf4 QueryParser(\cf8 "title"\cf2 , \cf5 analyzer\cf4 )\cf2 ;\
+        \cf4 Query query = \cf2 null;\
+        try \cf4 \{\
+            query = parser.parse(concatenatedInput)\cf2 ;\
+        \cf4 \} \cf2 catch \cf4 (ParseException e) \{\
+            \cf2 throw new \cf4 IOException(e)\cf2 ;\
+        \cf4 \}\
+        IndexReader reader = DirectoryReader.
+\f1\i open
+\f0\i0 (\cf5 index\cf4 )\cf2 ;\
+        \cf4 IndexSearcher searcher = \cf2 new \cf4 IndexSearcher(reader)\cf2 ;\
+        \cf4 TopDocs docs = searcher.search(query\cf2 , \cf9 10\cf4 )\cf2 ;\
+        \cf4 List<ResultClass> result = \cf2 new \cf4 ArrayList<>()\cf2 ;\
+        for \cf4 (ScoreDoc scoreDoc : docs.\cf5 scoreDocs\cf4 ) \{\
+            ResultClass resultClass = \cf2 new \cf4 ResultClass()\cf2 ;\
+            \cf4 resultClass.\cf5 DocName \cf4 = searcher.doc(scoreDoc.\cf5 doc\cf4 )\cf2 ;\
+            \cf4 resultClass.\cf5 docScore \cf4 = scoreDoc.\cf5 score\cf2 ;\
+            \cf4 result.add(resultClass)\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 result\cf2 ;\
+    \cf4 \}\
+\
+\
+    \cf2 public \cf4 List<ResultClass> \cf7 runQ1_1\cf4 (String[] query) \cf2 throws \cf4 java.io.FileNotFoundException\cf2 , \cf4 java.io.IOException \{\
+        \cf2 if \cf4 (!\cf5 indexExists\cf4 ) \{\
+            buildIndex()\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 runQueryOnIndex(query)\cf2 ;\
+    \cf4 \}\
+\
+    \cf2 public \cf4 List<ResultClass> \cf7 runQ1_2_a\cf4 (String[] query) \cf2 throws \cf4 java.io.FileNotFoundException\cf2 , \cf4 java.io.IOException \{\
+        \cf2 if \cf4 (!\cf5 indexExists\cf4 ) \{\
+            buildIndex()\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 runANDQueryOnIndex(query)\cf2 ;\
+    \cf4 \}\
+\
+    \cf2 public \cf4 List<ResultClass> \cf7 runQ1_2_b\cf4 (String[] query) \cf2 throws \cf4 java.io.FileNotFoundException\cf2 , \cf4 java.io.IOException \{\
+        \cf2 if \cf4 (!\cf5 indexExists\cf4 ) \{\
+            buildIndex()\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 runANDNOTQueryOnIndex(query)\cf2 ;\
+    \cf4 \}\
+\
+    \cf2 public \cf4 List<ResultClass> \cf7 runQ1_2_c\cf4 (String[] query) \cf2 throws \cf4 java.io.FileNotFoundException\cf2 , \cf4 java.io.IOException \{\
+        \cf2 if \cf4 (!\cf5 indexExists\cf4 ) \{\
+            buildIndex()\cf2 ;\
+        \cf4 \}\
+    \cf2 return \cf4 runANDWITHINQueryOnIndex(query)\cf2 ;\
+    \cf4 \}\
+\
+   \cf2 public \cf4 List<ResultClass> \cf7 runQ1_3\cf4 (String[] query) \cf2 throws \cf4 java.io.FileNotFoundException\cf2 , \cf4 java.io.IOException \{\
+\
+      \cf2 if \cf4 (!\cf5 indexExists\cf4 ) \{\
+          buildIndex()\cf2 ;\
+        \cf4 \}\
+        \cf2 return \cf4 runQueryOnIndex(query)\cf2 ;\
+    \cf4 \}\
+\
+\
+\
+\
+\}\
+\
+}
