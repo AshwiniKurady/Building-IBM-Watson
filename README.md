@@ -85,7 +85,7 @@ Below are the scores obtained in MRR where N represents total number of the rank
 #Matches: Total number of matches obtained for respective number of ranking chosen
 #Score : MMR Score
 
-![Measuring performance using MRR](/images/Measuring performance using MRR.png)
+![Measuring performance using MRR](/images/MeasuringPerformanceUsingMRR.png)
 
 As seen, after the top 10 results, further looking at lower ranked results does not have significant returns in terms of MRR. So N=10 is chosen (return top 10 ranked docs out of 280000) in this project.
 
@@ -140,7 +140,7 @@ used (and changed for an adhoc implementation, albeit unsuccessfully). ParserDem
 
 # Snapshot of sample run of JAR file on terminal:
 
-
+![Sample run of JAR file](/images/SampleRunofJARfile.png)
    
 
   
