@@ -24,9 +24,7 @@ Function buildIndex()
 a. Wikipedia collection has been indexed in lucene.
 
 b. Initializing Index by declaring variables such as StandardAnalyzer, FSDirectory, InderWriter
-Config and IndexWriter – FS directory is used to store the index.
-
-a. The index is stored inside resources/index/
+Config and IndexWriter – FS directory is used to store the index.The index is stored inside resources/index/
 
 c. Each Wikipedia page has been taken as a separate document in the Index.
 
