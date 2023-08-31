@@ -17,7 +17,7 @@ questions.txt – “src/main/resources/questions.txt”
 index - “src/main/resources/index/”
 wiki subset - “src/main/resources/wiki-subset/”
 
-# 1. IndexingandRetrieval
+# 1. Indexing and Retrieval
 
 Function buildIndex()
 
@@ -78,7 +78,7 @@ d. By Default, scoring function is taken as BM25.
 
 The values returned from the runQueryOnIndex function (resultclass containing the docid (doc title) and the doc scores) is then checked with the answers from the questions.txt file (present in resources directory). The top relevant documents are used to calculate the score that shows the efficacy of the IR system.
 
-# 2. MeasuringPerformance
+# 2. Measuring Performance
 
 Performance of the project is measured using mean reciprocal rank(MRR).
 Below are the scores obtained in MRR where N represents total number of the ranked document returned from query parser chosen to calculate the MRR.
@@ -101,7 +101,7 @@ It returns a non-zero value for ranked results which are not at position 1, ther
 
 Changing the scoring function lowered the performance from (MMR ~ 25%) to (MRR ~ 0.57%). 5 relevant documents were obtained with tf-idf weighting. One observation is that all these documents were available for BM25 too but with high rank. As per latest update, Indexwriterconfig.setSimilarity(new classicSimilarity) and Indexsearcher.setSimilarity(new classicSimilarity) was added but to no avail. The same results were obtained. Hence, this system performs very well with the default BM25 similarity.
 
-# 4. ErrorAnalysis
+# 4. Error Analysis
 
 Following is the split-up of the answers from the IR system for Top-10 & Top-30 answers :
 
@@ -122,7 +122,7 @@ b. Morenumbersinclues
 c. Quotes and punctuation marks - these are removed by standard analyzer
 and hence the quotation context is lost.
 
-# 5. ImprovementstotheIRsystem
+# 5. Improvements to the IR system
 
 a. Some of the approaches tried/implemented to improve the IR system are : a. Implementation of Stanford CoreNLP lemmatizer
 
